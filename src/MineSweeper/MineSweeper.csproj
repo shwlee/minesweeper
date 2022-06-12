@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>    
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="nlog.config" CopyToOutputDirectory="Always" />
+    <None Remove="C:\Users\heeya\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ClearScript.V8" Version="7.3.0" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="NLog" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MineSweeper.Commons\MineSweeper.Commons.csproj" />
+    <ProjectReference Include="..\MineSweeper.Defines\MineSweeper.Defines.csproj" />
+    <ProjectReference Include="..\MineSweeper.Models\MineSweeper.Models.csproj" />
+    <ProjectReference Include="..\MineSweeper.Player\MineSweeper.Player.csproj" />
+    <ProjectReference Include="..\MineSweeper.Services\MineSweeper.Services.csproj" />
+    <ProjectReference Include="..\MineSweeper.ViewModels\MineSweeper.ViewModels.csproj" />
+    <ProjectReference Include="..\MineSweeper.Views.Converters\MineSweeper.Views.Converters.csproj" />
+    <ProjectReference Include="..\MineSweeper.Views.Mappings\MineSweeper.Views.Mappings.csproj" />
+    <ProjectReference Include="..\MineSweeper.Views\MineSweeper.Views.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
