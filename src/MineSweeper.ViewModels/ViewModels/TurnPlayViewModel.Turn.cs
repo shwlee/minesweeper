@@ -11,7 +11,12 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
 {
     private async Task ExecuteTurn(int[] board, [Optional] bool useException)
     {
-        var player = Players![_lastTurnPlayer];
+        if (Players.Count is 0)
+        {
+            throw new GameNotInitializedExceptionException("There is no player.");
+        }
+
+        var player = Players[_lastTurnPlayer];
 
         try
         {

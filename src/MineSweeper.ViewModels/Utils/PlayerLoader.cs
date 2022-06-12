@@ -29,21 +29,28 @@ public class PlayerLoader : IPlayerLoader
     /// 파일 플랫폼을 선택하여 로딩.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<IPlayer> LoadPlayers(Platform platform)
+    public IEnumerable<IPlayer> LoadPlayers(Platform platform, int size = 4)
     {
-        var players = new List<IPlayer>(4);
+        var players = new List<IPlayer>(size);
 
         // file dialog
-        var files = _fileDialog.GetFiles(platform);
+        var files = _fileDialog.GetFiles(platform)?.Take(4);
+        if (files is null)
+        {
+            throw new ArgumentNullException(nameof(files));
+        }
+
+        var filePathes = files.Take(size).ToArray();
+
         switch (platform)
         {
             case Platform.CS:
-                LoadSelectedCSharpPlayers(players, files!);
+                LoadSelectedCSharpPlayers(players, filePathes!);
                 break;
             case Platform.CPP:
                 break;
             case Platform.Javascript:
-                LoadSelectedJavascriptFiles(players, files!);
+                LoadSelectedJavascriptFiles(players, filePathes!);
                 break;
             case Platform.Python:
                 break;
@@ -104,11 +111,6 @@ public class PlayerLoader : IPlayerLoader
     {
         foreach (var file in files)
         {
-            if (players.Count >= 4)
-            {
-                return;
-            }
-
             var player = new JavascriptPlayer(file, _logger);
             players.Add(player);
         }
@@ -136,12 +138,6 @@ public class PlayerLoader : IPlayerLoader
     {
         foreach (var file in files)
         {
-
-            if (players.Count >= 4)
-            {
-                return;
-            }
-
             var loadContext = new AssemblyLoadContext(Guid.NewGuid().ToString(), true);
             _loadAssemblies.Add(loadContext);
 

@@ -17,6 +17,8 @@ namespace MineSweeper.ViewModels;
 
 public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
 {
+    private const int MaxPlayerCount = 4;
+
     private IGameState _gameState;
 
     private IPlayerLoader _playerLoader;
@@ -29,7 +31,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
 
     private int _turnCount = 1;
 
-    private CancellationTokenSource? _autoPlayCancelTokenSource = new CancellationTokenSource();
+    private CancellationTokenSource? _autoPlayCancelTokenSource = new ();
 
     private Task? _autoPlay;
 
@@ -45,7 +47,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
     private AutoPlay _autoSpeed;
 
     [ObservableProperty]
-    private ObservableCollection<TurnPlayer>? _players = new();
+    private ObservableCollection<TurnPlayer> _players = new();
 
     public int TurnCount
     {
@@ -110,7 +112,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
             return;
         }
 
-        foreach (var player in Players!)
+        foreach (var player in Players)
         {
             if (player is null)
             {
@@ -140,28 +142,40 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         var winnerMessage = new WinnerPopupMessage(Players.ToList());
         Messenger.Send(winnerMessage);
 
-        _logger.Info($"Game Over. turn:{TurnCount}. players: {string.Join(",", Players!.Select(player => $"[{player.Index}] {player.Name}({player.Score})"))}");
+        _logger.Info($"Game Over. turn:{TurnCount}. players: {string.Join(",", Players.Select(player => $"[{player.Index}] {player.Name}({player.Score})"))}");
     }
 
     [ICommand]
     private void LoadPlayers(object platform)
     {
+        var playerCount = Players.Count;
+        if (playerCount >= MaxPlayerCount)
+        {
+            _logger.Info($"The players have already limit count. count:{playerCount}");
+            return;
+        }
+
         (int columns, int rows) = _gameState.GetColumRows();
         _maxTurn = columns * rows;
 
         var loadPlatform = (Platform)platform;
 
-        var loadedPlayers = _playerLoader.LoadPlayers(loadPlatform);
+        var loadSize = MaxPlayerCount - playerCount;
+        if (loadSize is 0)
+        {
+            return;
+        }
+
+        var loadedPlayers = _playerLoader.LoadPlayers(loadPlatform, loadSize);
         var players = loadedPlayers.OrderBy(player => new Random().Next(columns * rows))
-                        .Select((player, i) => new TurnPlayer(player, i))
+                        .Select((player, i) => new TurnPlayer(player, i + playerCount))
                         .ToList(); // random 배치.
 
         foreach (var player in players)
         {
             player.Turn.Initialize(player.Index, columns, rows, _gameState.GetNumberOfTotalMines());
+            Players.Add(player);
         }
-
-        Players = new ObservableCollection<TurnPlayer>(players);
     }
 
     [ICommand]
@@ -169,7 +183,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
     {
         _playerLoader.ClearLoadedPlayers();
 
-        Players!.Clear();
+        Players.Clear();
     }
 
     [ICommand]
@@ -182,7 +196,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
             await ExecuteTurn(board, false);
 
             // 수동턴에 의한 lastTurnPlayer 와 TurnCount 보정.
-            if (_lastTurnPlayer >= Players!.Count - 1)
+            if (_lastTurnPlayer >= Players.Count - 1)
             {
                 _lastTurnPlayer = 0;
                 TurnCount++;
@@ -195,7 +209,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         }
         finally
         {
-            if (Players!.Count > 1)
+            if (Players.Count > 1)
             {
                 _lastTurnPlayer++;
             }
@@ -341,12 +355,12 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         }
 
         // 모든 플레이어가 Close 상태.
-        if (Players!.All(player => player.IsClosePlayer))
+        if (Players.All(player => player.IsClosePlayer))
         {
             return true;
         }
 
-        if (Players!.All(player => player.IsOutPlayer))
+        if (Players.All(player => player.IsOutPlayer))
         {
             return true;
         }
