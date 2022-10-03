@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-using Microsoft.Toolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MineSweeper.Defines.Games;
 using MineSweeper.Models;
 using MineSweeper.Models.Messages;
@@ -80,8 +80,8 @@ public partial class GameViewModel : ObservableRecipient, IGameState
     protected override void OnActivated()
     {
         // 수동으로 조작했을 때 처리하기 위한 옵션.
-        Messenger.Register<GameViewModel, OpenBoxMessage>(this, (r, m) => r.OpenBox(m.Target));
-        Messenger.Register<GameViewModel, MarkBoxMessage>(this, (r, m) => r.MarkBox(m.Target));
+        WeakReferenceMessenger.Default.Register<GameViewModel, OpenBoxMessage>(this, (r, m) => r.OpenBox(m.Target));
+        WeakReferenceMessenger.Default.Register<GameViewModel, MarkBoxMessage>(this, (r, m) => r.MarkBox(m.Target));
     }
 
     public int[]? GetBoard()
@@ -176,7 +176,7 @@ public partial class GameViewModel : ObservableRecipient, IGameState
         return resultScore + inGameScore;
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ApplyLayout()
     {
         _boxList.Clear();

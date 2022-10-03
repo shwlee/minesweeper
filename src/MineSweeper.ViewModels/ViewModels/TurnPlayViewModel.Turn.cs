@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MineSweeper.Commons.Extensions;
 using MineSweeper.Defines.Games;
 using MineSweeper.Models;

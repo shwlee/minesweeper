@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-using Microsoft.Toolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MineSweeper.Commons.Extensions;
 using MineSweeper.Defines.Enums;
 using MineSweeper.Defines.Games;
@@ -74,7 +74,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
 
     protected override void OnActivated()
     {
-        Messenger.Register<TurnPlayViewModel, GameMessage>(this, (r, m) => r.GameMessage(m));
+        WeakReferenceMessenger.Default.Register<TurnPlayViewModel, GameMessage>(this, (r, m) => r.GameMessage(m));
     }
 
     private async void GameMessage(GameMessage message)
@@ -145,7 +145,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         _logger.Info($"Game Over. turn:{TurnCount}. players: {string.Join(",", Players.Select(player => $"[{player.Index}] {player.Name}({player.Score})"))}");
     }
 
-    [ICommand]
+    [RelayCommand]
     private void LoadPlayers(object platform)
     {
         var playerCount = Players.Count;
@@ -178,7 +178,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private void ClearLoadedPlayers()
     {
         _playerLoader.ClearLoadedPlayers();
@@ -186,7 +186,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         Players.Clear();
     }
 
-    [ICommand]
+    [RelayCommand]
     private async void TurnOne()
     {
         try
@@ -216,7 +216,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private async void TurnAll()
     {
         try
@@ -230,7 +230,7 @@ public partial class TurnPlayViewModel : ObservableRecipient, ITurnProcess
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private async void AutoTurn()
     {
         if (_gameState.IsInitialized is false)

@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-using Microsoft.Toolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MineSweeper.Defines.Games;
 using MineSweeper.Models;
 using MineSweeper.Models.Models.Messages;
@@ -22,7 +22,7 @@ public partial class GameOverViewModel : ObservableRecipient, IPopupContent
     public GameOverViewModel(IEnumerable<TurnPlayer> players, ILogger logger)
     {
         _players = new ObservableCollection<TurnPlayer>(players);
-        _winner = _players?.OrderByDescending(player => player.Index).MaxBy(player => player.Score);
+        _winner = _players.OrderByDescending(player => player.Index).MaxBy(player => player.Score);
         if (_winner is not null)
         {
             _winner.IsWinner = true;
@@ -34,9 +34,9 @@ public partial class GameOverViewModel : ObservableRecipient, IPopupContent
         _logger.Info($"Player board: {string.Join(",", _players.Select(player => $"[{player.Name}:{player.Score}]"))}");
     }
 
-    [ICommand]
+    [RelayCommand]
     private void Close(object args)
     {
-        Messenger.Send(new NotificationCloseMessage());
+        WeakReferenceMessenger.Default.Send(new NotificationCloseMessage());
     }
 }

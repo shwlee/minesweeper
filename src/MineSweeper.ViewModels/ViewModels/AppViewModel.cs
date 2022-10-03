@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-using Microsoft.Toolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using MineSweeper.Defines.Games;
 using MineSweeper.Defines.Utils;
 using MineSweeper.Models.Models.Messages;
@@ -39,8 +39,8 @@ public partial class AppViewModel : ObservableRecipient
 
     protected override void OnActivated()
     {
-        Messenger.Register<AppViewModel, WinnerPopupMessage>(this, (r, m) => r.PopupGameOver(m));
-        Messenger.Register<AppViewModel, NotificationCloseMessage>(this, (r, m) => r.CloseNotification());
+        WeakReferenceMessenger.Default.Register<AppViewModel, WinnerPopupMessage>(this, (r, m) => r.PopupGameOver(m));
+        WeakReferenceMessenger.Default.Register<AppViewModel, NotificationCloseMessage>(this, (r, m) => r.CloseNotification());
     }
 
     private void CloseNotification()
@@ -62,7 +62,7 @@ public partial class AppViewModel : ObservableRecipient
         _logger.Info("Notification panel popped up!");
     }
 
-    [ICommand]
+    [RelayCommand]
     private void OpenConsole(object args)
     {
         _consoleOut.CloseConsole();
@@ -70,7 +70,7 @@ public partial class AppViewModel : ObservableRecipient
         _consoleOut.LoadConsole();
     }
 
-    [ICommand]
+    [RelayCommand]
     private void CloseConsole(object args)
     {
         _consoleOut.CloseConsole();
